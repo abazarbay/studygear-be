@@ -2,11 +2,9 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { MongoClient } from 'mongodb';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import history from 'connect-history-api-fallback';
 
 const app = express();
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use(bodyParser.json());
 
 app.use('/images', express.static(path.join(__dirname, '../assets')));
