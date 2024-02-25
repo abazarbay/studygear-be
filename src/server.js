@@ -66,7 +66,7 @@ app.post('/api/users/:userId/cart', async (req, res) => {
     const { programmId } = req.body;
     const client = await MongoClient.connect(
       process.env.MONGO_USER && process.env.MONGO_PASS 
-      ? `mongodb+srv://:${process.env.MONGO_PASS}@cluster0.wos7rvs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
+      ? `mongodb+srv://studygear-backend:${process.env.MONGO_PASS}:@cluster0.wos7rvs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
       : 'mongodb://localhost:27017', 
       { }
     );
