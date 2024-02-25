@@ -32,6 +32,5 @@
     "@babel/preset-env": "^7.23.9",
     "@babel/types": "^7.23.9",
     "nodemon": "^3.0.3"
-  },
-  "type": "module"
+  }
 }
