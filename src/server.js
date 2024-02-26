@@ -137,6 +137,38 @@ app.post('/send-email', async (req, res) => {
 });
 
 
+app.post('/api/submit-survey', async (req, res) => {
+  let client;
+  try {
+    const { surveyResponses } = req.body;
+
+    client = await MongoClient.connect(
+      process.env.MONGO_USER && process.env.MONGO_PASS
+        ? `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.wos7rvs.mongodb.net/${process.env.MONGO_DBNAME}?retryWrites=true&w=majority&appName=Cluster0`
+        : 'mongodb://localhost:27017',
+      {}
+    );
+
+    const db = client.db(process.env.MONGO_DBNAME || 'vue-db');
+
+    for (const response of surveyResponses) {
+      await db.collection('survey').insertOne(response);
+    }
+
+    res.status(200).json({ message: 'Survey responses inserted successfully' });
+  } catch (error) {
+    console.error('Error inserting survey responses:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  } finally {
+    if (client) {
+      client.close();
+    }
+  }
+});
+
+
+
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
