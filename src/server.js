@@ -3,10 +3,15 @@ import bodyParser from 'body-parser';
 import { MongoClient } from 'mongodb';
 import path from 'path';
 import history from 'connect-history-api-fallback';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+import cors from 'cors';
+dotenv.config();
 
 const app = express();
-app.use(bodyParser.json());
 
+app.use(bodyParser.json());
+app.use(cors());
 app.use('/images', express.static(path.join(__dirname, '../assets')));
 app.use(express.static(path.resolve(__dirname, '../dist'), {maxAge: '1y', etag: false}));
 app.use(history());
@@ -102,6 +107,35 @@ app.delete('/api/users/:userId/cart/:programmId', async (req, res) => {
     res.status(200).json(cartItems);
     client.close();
 });
+
+app.post('/send-email', async (req, res) => {
+  const { username, email, message } = req.body;
+
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_PASS
+    }
+  });
+
+  const mailOptions = {
+    from: username,
+    to: process.env.GMAIL_USER, 
+    subject: 'Neue Kontaktanfrage',
+    text: `Name: ${username}\nE-Mail: ${email}\nNachricht: ${message}`
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return res.status(500).send(error.toString());
+    }
+    res.status(200).send('E-Mail erfolgreich gesendet: ' + info.response);
+  });
+});
+
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
